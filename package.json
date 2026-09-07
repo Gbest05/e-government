@@ -1,0 +1,21 @@
+{
+  "name": "remo-north-egovern",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remo North Local Government E-Government Portal",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd frontend && npm run preview -- --port $PORT --host 0.0.0.0",
+    "frontend:install": "cd frontend && npm install",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:dev": "cd frontend && npm run dev"
+  },
+  "keywords": [
+    "egovernment",
+    "remo-north",
+    "ogun-state",
+    "nigeria"
+  ],
+  "author": "Remo North Local Government Council",
+  "license": "ISC"
+}

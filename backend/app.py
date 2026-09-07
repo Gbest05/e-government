@@ -59,9 +59,44 @@ def create_app(config_class=Config):
             'version': '1.0.0'
         }), 200
 
+    # Path to frontend production build if present
+    candidates = [
+        os.path.abspath(os.path.join(app.root_path, 'frontend', 'dist')),
+        os.path.abspath(os.path.join(app.root_path, '..', 'frontend', 'dist')),
+        os.path.abspath(os.path.join(app.root_path, 'dist')),
+    ]
+    frontend_dist = candidates[0]
+    for c in candidates:
+        if os.path.exists(os.path.join(c, 'index.html')):
+            frontend_dist = c
+            break
+
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve_frontend(path):
+        if path.startswith('api'):
+            return jsonify({'error': 'The requested resource could not be found.', 'status_code': 404}), 404
+        if os.path.exists(os.path.join(frontend_dist, path)) and path != '':
+            return send_from_directory(frontend_dist, path)
+        if os.path.exists(os.path.join(frontend_dist, 'index.html')):
+            return send_from_directory(frontend_dist, 'index.html')
+        return jsonify({
+            'service': 'Remo North Local Government E-Government API',
+            'status': 'healthy',
+            'message': 'API is active. Frontend build not found in dist.'
+        })
+
     # User-friendly error handlers
     @app.errorhandler(404)
     def not_found_error(error):
+        from flask import request
+        if request.path.startswith('/api'):
+            return jsonify({
+                'error': 'The requested resource could not be found.',
+                'status_code': 404
+            }), 404
+        if os.path.exists(os.path.join(frontend_dist, 'index.html')):
+            return send_from_directory(frontend_dist, 'index.html')
         return jsonify({
             'error': 'The requested resource could not be found.',
             'status_code': 404
