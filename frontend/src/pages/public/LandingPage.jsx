@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSettings } from '../../context/SettingsContext';
+import { getFileUrl } from '../../services/api';
 import { servicesService, announcementsService } from '../../services/api';
 import {
   Landmark,
@@ -21,6 +23,7 @@ import {
 } from 'lucide-react';
 
 const LandingPage = () => {
+  const { settings } = useSettings();
   const [searchTerm, setSearchTerm] = useState('');
   const [services, setServices] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
@@ -82,18 +85,24 @@ const LandingPage = () => {
           <div className="text-center max-w-3xl mx-auto space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-civic-800/80 border border-civic-600/50 text-civic-300 text-xs font-semibold backdrop-blur-md shadow-inner">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Modernizing Public Service Delivery &bull; Remo North LGA</span>
+              <span>{settings?.hero_badge || 'Modernizing Public Service Delivery • Remo North LGA'}</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              Government Services, <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-civic-300 to-amber-300">
-                Made Easier for Everyone
-              </span>
-            </h1>
+            <div className="space-y-3">
+              {settings?.logo_url && (
+                <img
+                  src={getFileUrl(settings.logo_url)}
+                  alt={settings.site_name}
+                  className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl object-contain bg-white p-2 shadow-2xl border border-white/10"
+                />
+              )}
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                {settings?.hero_title || 'Government Services, Made Easier for Everyone'}
+              </h1>
+            </div>
 
             <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              Access local government services, submit official requests, report community issues, and track your applications from one convenient, transparent digital platform.
+              {settings?.hero_subtitle || 'Access local government services, submit official requests, report community issues, and track your applications from one convenient, transparent digital platform.'}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
@@ -101,7 +110,7 @@ const LandingPage = () => {
                 to="/services"
                 className="w-full sm:w-auto px-8 py-3.5 bg-civic-600 hover:bg-civic-500 text-white font-bold rounded-xl shadow-lg shadow-civic-900/30 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
               >
-                <span>Access Services</span>
+                <span>{settings?.hero_cta_primary || 'Access Services'}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
@@ -109,7 +118,7 @@ const LandingPage = () => {
                 className="w-full sm:w-auto px-8 py-3.5 bg-slate-800/90 hover:bg-slate-700/90 text-slate-100 font-bold rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition-all"
               >
                 <AlertTriangle className="w-4 h-4 text-amber-400" />
-                <span>Report a Problem</span>
+                <span>{settings?.hero_cta_secondary || 'Report a Problem'}</span>
               </Link>
             </div>
           </div>

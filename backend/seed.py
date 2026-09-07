@@ -10,6 +10,7 @@ from models.report import CommunityReport, CommunityReportUpdate
 from models.complaint import Complaint, ComplaintUpdate
 from models.announcement import Announcement
 from models.notification import Notification
+from models.setting import Setting
 
 app = create_app()
 
@@ -757,6 +758,26 @@ def seed_database():
             )
         ]
         db.session.add_all(notifs)
+
+        print("Seeding Default Website Branding & Landing Page Settings...")
+        council_setting = Setting(
+            site_name='Remo North Local Government',
+            site_short_name='REMO NORTH',
+            logo_url=None,
+            hero_badge='Official E-Government Portal',
+            hero_title='Empowering Remo North Through Modern Digital Governance',
+            hero_subtitle='Access municipal services, submit statutory applications, report local infrastructure problems, and track approvals seamlessly from anywhere.',
+            hero_cta_primary='Explore All Services',
+            hero_cta_secondary='Report Community Issue',
+            announcement_banner='Official Portal of Remo North Local Government, Ogun State • Secretariat: Isara-Remo',
+            secretariat_address='Local Government Secretariat Complex, Palace Way, Isara-Remo',
+            emergency_helpline='0800-REMO-HELP',
+            main_phone='+234 (0) 803 111 2233',
+            official_email='info@remonorth.og.gov.ng',
+            state_name='Ogun State, Nigeria',
+            about_summary='Remo North Local Government Area is an administrative hub in Ogun State with council headquarters situated in Isara-Remo. It encompasses 10 electoral wards across historic towns including Isara, Ode, Ipara, Akaka, Ilara, and Orile-Oko.'
+        )
+        db.session.add(council_setting)
 
         db.session.commit()
         print("\n==================================================================")

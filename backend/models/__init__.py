@@ -6,6 +6,7 @@ from .report import CommunityReport, CommunityReportUpdate
 from .complaint import Complaint, ComplaintUpdate
 from .announcement import Announcement
 from .notification import Notification
+from .setting import Setting
 
 __all__ = [
     'User',
@@ -20,5 +21,6 @@ __all__ = [
     'Complaint',
     'ComplaintUpdate',
     'Announcement',
-    'Notification'
+    'Notification',
+    'Setting'
 ]

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getFileUrl } from '../../services/api';
 import {
   LayoutDashboard,
   FileText,
@@ -111,9 +112,17 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         {/* User Card */}
         <div className="px-5 py-4 bg-slate-950/50 border-b border-slate-800/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-civic-800 text-white font-bold flex items-center justify-center text-sm border border-civic-600">
-            {user.full_name?.charAt(0) || 'U'}
-          </div>
+          {user?.profile_image ? (
+            <img
+              src={getFileUrl(user.profile_image)}
+              alt={user.full_name}
+              className="w-10 h-10 rounded-full object-cover border border-civic-600 shadow shrink-0"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-civic-800 text-white font-bold flex items-center justify-center text-sm border border-civic-600 shrink-0">
+              {user.full_name?.charAt(0) || 'U'}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-white truncate">{user.full_name}</p>
             <p className="text-[11px] text-slate-400 truncate">{user.email}</p>

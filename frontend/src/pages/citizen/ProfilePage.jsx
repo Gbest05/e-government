@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { authService } from '../../services/api';
-import { User, Mail, Phone, MapPin, Lock, CheckCircle2, AlertCircle, Save, KeyRound } from 'lucide-react';
+import { authService, uploadFile, getFileUrl } from '../../services/api';
+import { User, Mail, Phone, MapPin, Lock, CheckCircle2, AlertCircle, Save, KeyRound, Camera, Trash2, Loader2 } from 'lucide-react';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
+  const avatarInputRef = useRef(null);
 
   const [profileForm, setProfileForm] = useState({
     full_name: user?.full_name || '',
@@ -25,6 +26,7 @@ const ProfilePage = () => {
   const [passErr, setPassErr] = useState(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPass, setSavingPass] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const communities = [
     'Isara-Remo',
@@ -34,6 +36,50 @@ const ProfilePage = () => {
     'Ilara-Remo',
     'Orile-Oko'
   ];
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setProfileErr('Please select a valid image file (JPG, PNG, WEBP).');
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setProfileErr(null);
+    setProfileMsg(null);
+
+    try {
+      const uploaded = await uploadFile(file, 'avatars');
+      if (uploaded?.url) {
+        const res = await authService.updateProfile({ profile_image: uploaded.url });
+        updateUser(res.data.user);
+        setProfileMsg('Profile picture updated successfully!');
+      }
+    } catch (err) {
+      setProfileErr(err.response?.data?.error || 'Failed to upload profile picture.');
+    } finally {
+      setUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setUploadingAvatar(true);
+    setProfileErr(null);
+    setProfileMsg(null);
+
+    try {
+      const res = await authService.updateProfile({ profile_image: '' });
+      updateUser(res.data.user);
+      setProfileMsg('Profile picture removed.');
+    } catch (err) {
+      setProfileErr(err.response?.data?.error || 'Failed to remove profile picture.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
@@ -90,16 +136,73 @@ const ProfilePage = () => {
           My Profile & Settings
         </h1>
         <p className="text-xs sm:text-sm text-slate-500">
-          Manage your personal information, local area residential ward, and password credentials.
+          Manage your personal information, profile photo, local area residential ward, and password credentials.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left: Summary Card */}
+        {/* Left: Summary Card with Avatar Uploader */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center space-y-4 h-fit">
-          <div className="w-20 h-20 rounded-full bg-civic-800 text-white font-black text-2xl flex items-center justify-center mx-auto shadow-md">
-            {user?.full_name?.charAt(0) || 'U'}
+          <div className="relative w-24 h-24 mx-auto">
+            {user?.profile_image ? (
+              <img
+                src={getFileUrl(user.profile_image)}
+                alt={user?.full_name}
+                className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-civic-600"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-civic-800 text-white font-black text-3xl flex items-center justify-center shadow-md border-2 border-civic-600">
+                {user?.full_name?.charAt(0) || 'U'}
+              </div>
+            )}
+
+            <input
+              type="file"
+              ref={avatarInputRef}
+              onChange={handleAvatarUpload}
+              accept="image/*"
+              className="hidden"
+            />
+
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute bottom-0 right-0 p-2 bg-civic-800 hover:bg-civic-900 text-white rounded-full shadow-lg transition-transform hover:scale-110 disabled:opacity-50"
+              title="Upload Profile Picture"
+            >
+              {uploadingAvatar ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Camera className="w-3.5 h-3.5" />
+              )}
+            </button>
           </div>
+
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="text-xs font-bold text-civic-800 hover:text-civic-900 hover:underline inline-block"
+            >
+              {uploadingAvatar ? 'Uploading Picture...' : 'Change Profile Photo'}
+            </button>
+
+            {user?.profile_image && (
+              <div>
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  disabled={uploadingAvatar}
+                  className="text-[11px] font-semibold text-rose-600 hover:text-rose-800 hover:underline"
+                >
+                  Remove Photo
+                </button>
+              </div>
+            )}
+          </div>
+
           <div>
             <h3 className="text-base font-bold text-slate-900">{user?.full_name}</h3>
             <p className="text-xs text-slate-500">{user?.email}</p>

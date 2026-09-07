@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { notificationsService } from '../../services/api';
+import { notificationsService, getFileUrl } from '../../services/api';
 import { Menu, Bell, Check, User, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -129,10 +129,21 @@ const DashboardHeader = ({ onToggleSidebar, title = 'Dashboard' }) => {
         </div>
 
         {/* User Pill */}
-        <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
-          <div className="w-8 h-8 rounded-full bg-civic-800 text-white font-bold text-xs flex items-center justify-center">
-            {user?.full_name?.charAt(0) || 'U'}
-          </div>
+        <Link 
+          to={user?.role === 'admin' ? '/admin/profile' : user?.role === 'staff' ? '/staff/profile' : '/citizen/profile'}
+          className="flex items-center gap-2 pl-3 border-l border-slate-200 group hover:opacity-90 transition-opacity"
+        >
+          {user?.profile_image ? (
+            <img
+              src={getFileUrl(user.profile_image)}
+              alt={user.full_name}
+              className="w-8 h-8 rounded-full object-cover border border-civic-600 shadow-sm"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-civic-800 text-white font-bold text-xs flex items-center justify-center">
+              {user?.full_name?.charAt(0) || 'U'}
+            </div>
+          )}
           <div className="hidden sm:block text-left">
             <span className="text-xs font-bold text-slate-800 block truncate max-w-[130px]">
               {user?.full_name}
@@ -141,7 +152,7 @@ const DashboardHeader = ({ onToggleSidebar, title = 'Dashboard' }) => {
               {user?.role}
             </span>
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   );

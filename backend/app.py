@@ -16,6 +16,7 @@ from routes.department_routes import department_bp
 from routes.admin_routes import admin_bp
 from routes.staff_routes import staff_bp
 from routes.upload_routes import upload_bp
+from routes.setting_routes import setting_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static')
@@ -43,6 +44,7 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(staff_bp, url_prefix='/api/staff')
     app.register_blueprint(upload_bp, url_prefix='/api/upload')
+    app.register_blueprint(setting_bp, url_prefix='/api/settings')
 
     # Serve uploaded files locally when not using cloud storage
     @app.route('/static/uploads/<path:filename>')

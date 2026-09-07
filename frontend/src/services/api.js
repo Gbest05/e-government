@@ -109,6 +109,20 @@ export const staffService = {
   getDashboardStats: () => api.get('/staff/dashboard'),
 };
 
+export const settingsService = {
+  getSettings: () => api.get('/settings'),
+  updateSettings: (data) => api.put('/settings', data),
+};
+
+export const getFileUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const base = import.meta.env.VITE_API_URL || '';
+  return base ? `${base}${path}` : path;
+};
+
 export const uploadFile = async (file, folder = 'documents') => {
   const formData = new FormData();
   formData.append('file', file);

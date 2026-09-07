@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useSettings } from '../../context/SettingsContext';
+import { getFileUrl } from '../../services/api';
 import { Menu, X, Landmark, ShieldCheck, ChevronRight, User, LogOut, FileText, AlertTriangle } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -39,11 +42,11 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Official Portal of Remo North Local Government, Ogun State</span>
+            <span>{settings?.announcement_banner || 'Official Portal of Remo North Local Government, Ogun State'}</span>
           </div>
           <div className="hidden sm:flex items-center gap-4 text-slate-300">
-            <span>Council Secretariat, Isara-Remo</span>
-            <span>Emergency: 0800-REMO-HELP</span>
+            <span>{settings?.secretariat_address?.split(',')[0] || 'Council Secretariat'}, Isara-Remo</span>
+            <span>Emergency: {settings?.emergency_helpline || '0800-REMO-HELP'}</span>
           </div>
         </div>
       </div>
@@ -52,18 +55,26 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16 sm:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-civic-800 to-civic-600 flex items-center justify-center text-white shadow-md shadow-civic-900/10 group-hover:scale-105 transition-transform">
-              <Landmark className="w-6 h-6 sm:w-7 sm:h-7 text-amber-300" />
-            </div>
+            {settings?.logo_url ? (
+              <img
+                src={getFileUrl(settings.logo_url)}
+                alt={settings?.site_name || 'Logo'}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain bg-white p-1 shadow-md border border-slate-200/80 group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-civic-800 to-civic-600 flex items-center justify-center text-white shadow-md shadow-civic-900/10 group-hover:scale-105 transition-transform">
+                <Landmark className="w-6 h-6 sm:w-7 sm:h-7 text-amber-300" />
+              </div>
+            )}
             <div>
               <div className="text-base sm:text-lg font-bold text-slate-900 leading-tight tracking-tight flex items-center gap-1.5">
-                <span>REMO NORTH</span>
+                <span>{settings?.site_short_name || 'REMO NORTH'}</span>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-civic-100 text-civic-800 font-semibold border border-civic-200">
                   L.G.A
                 </span>
               </div>
-              <div className="text-xs font-medium text-slate-500">
-                E-Government Management System
+              <div className="text-xs font-medium text-slate-500 truncate max-w-[200px] sm:max-w-xs">
+                {settings?.site_name || 'E-Government Management System'}
               </div>
             </div>
           </Link>

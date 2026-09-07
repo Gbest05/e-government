@@ -169,6 +169,7 @@ function App() {
           <Route path="announcements" element={<AdminAnnouncementsPage />} />
           <Route path="analytics" element={<AdminAnalyticsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="notifications" element={<NotificationsPage />} />
         </Route>
       </Route>
